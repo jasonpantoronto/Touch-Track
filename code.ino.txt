@@ -1,0 +1,291 @@
+ 
+
+#include <SD.h>  // Include the SD library for working with SD cards 
+
+  
+
+#define SD_ChipSelectPin 53  // Define the chip select pin for the SD card 
+
+  
+
+#include <TMRpcm.h>  // Include the TMRpcm library for playing audio 
+
+  
+
+#include <SPI.h>  // Include the SPI library 
+
+  
+
+TMRpcm tmrpcm;  // Create an instance of the TMRpcm library 
+
+  
+
+const int TSP1 = 25;  // Define pin numbers for touch sensors 
+
+const int TSP2 = 27; 
+
+const int TSP3 = 29; 
+
+const int TSP4 = 31; 
+
+const int TSP5 = 33; 
+
+const int RUP = 24;  // Define pin numbers for resistive up, down, and function buttons 
+
+const int RDN = 26; 
+
+const int FUN = 28; 
+
+  
+
+int resistance_counter = 1;  // Initialize counters for various actions 
+
+int fact_counter = 1; 
+
+int encourage_counter = 1; 
+
+  
+
+void setup(){  // Setup function runs once when the program starts 
+
+  
+
+  tmrpcm.speakerPin = 46;  // Set the speaker pin for TMRpcm 
+
+  
+
+  pinMode(TSP1, INPUT);  // Set pin modes for touch sensors, buttons, and resistors 
+
+  pinMode(TSP2, INPUT); 
+
+  pinMode(TSP3, INPUT); 
+
+  pinMode(TSP4, INPUT); 
+
+  pinMode(TSP5, INPUT); 
+
+  pinMode(RUP, INPUT_PULLUP); 
+
+  pinMode(RDN, INPUT_PULLUP); 
+
+  pinMode(FUN, INPUT_PULLUP); 
+
+  
+
+  Serial.begin(9600);  // Initialize serial communication 
+
+  
+
+  if (!SD.begin(SD_ChipSelectPin)) {  // Initialize SD card 
+
+    Serial.println("SD fail");  // Print message if SD card initialization fails 
+
+    return;  // Exit setup if SD card initialization fails 
+
+  }  
+
+  
+
+  tmrpcm.play("welc.wav");  // Play a welcome audio file 
+
+}  
+
+  
+
+int RUPValue = 0;  // Initialize variables for button states 
+
+int RDNValue = 0; 
+
+int FUNValue = 0; 
+
+bool overrideRDN = false;  // Initialize override flags for buttons 
+
+bool overrideRUP = false; 
+
+bool overrideFUN = false; 
+
+  
+
+void loop(){  // Loop function runs repeatedly 
+
+  
+
+  int state1 = digitalRead(TSP1);  // Read state of touch sensors, buttons 
+
+  int state2 = digitalRead(TSP2); 
+
+  int state3 = digitalRead(TSP3); 
+
+  int state4 = digitalRead(TSP4); 
+
+  int state5 = digitalRead(TSP5); 
+
+  int stateRUP = digitalRead(RUP); 
+
+  int stateRDN = digitalRead(RDN); 
+
+  int stateFUN = digitalRead(FUN); 
+
+  delay(10);  // Small delay 
+
+  
+
+  // Handling resistance down button 
+
+  if(stateRDN==0 && !overrideRDN){  // If resistance down button is pressed and not overridden 
+
+    resistance_counter--;  // Decrement resistance counter 
+
+    tmrpcm.play("rest.wav");  // Play audio file 
+
+    delay(2000);  // Delay 
+
+    char filename[15];  // Create filename 
+
+    sprintf(filename, "%d.wav", resistance_counter);  // Format filename with counter value 
+
+    tmrpcm.play(filename);  // Play audio file 
+
+    delay(2000);  // Delay 
+
+    overrideRDN = true;  // Set override flag 
+
+  } else if(stateRDN==1 && overrideRDN){  // If resistance down button is released and overridden 
+
+    overrideRDN = false;  // Clear override flag 
+
+  }  
+
+  
+
+  // Handling resistance up button 
+
+  if(stateRUP==0 && !overrideRUP){  // If resistance up button is pressed and not overridden 
+
+    resistance_counter++;  // Increment resistance counter 
+
+    tmrpcm.play("rest.wav");  // Play audio file 
+
+    delay(2000);  // Delay 
+
+    char filename[15];  // Create filename 
+
+    sprintf(filename, "%d.wav", resistance_counter);  // Format filename with counter value 
+
+    tmrpcm.play(filename);  // Play audio file 
+
+    delay(3000);  // Delay 
+
+    overrideRUP = true;  // Set override flag 
+
+  } else if(stateRUP==1 && overrideRUP){  // If resistance up button is released and overridden 
+
+    overrideRUP = false;  // Clear override flag 
+
+  }  
+
+  
+
+  // Handling function button 
+
+  if(stateFUN==0 && !overrideFUN){  // If function button is pressed and not overridden 
+
+    tmrpcm.play("rest.wav");  // Play audio file 
+
+    delay(2000);  // Delay 
+
+    char filename[15];  // Create filename 
+
+    sprintf(filename, "%d.wav", resistance_counter);  // Format filename with counter value 
+
+    tmrpcm.play(filename);  // Play audio file 
+
+    delay(3000);  // Delay 
+
+    char enc_name[15];  // Create filename for encouragement audio 
+
+    sprintf(enc_name, "enc%d.wav", encourage_counter);  // Format filename with counter value 
+
+    tmrpcm.play(enc_name);  // Play encouragement audio 
+
+    delay(2000);  // Delay 
+
+    encourage_counter++;  // Increment encouragement counter 
+
+    char factname[15];  // Create filename for fact audio 
+
+    sprintf(factname, "fac%d.wav", fact_counter);  // Format filename with counter value 
+
+    tmrpcm.play(factname);  // Play fact audio 
+
+    delay(7000);  // Delay 
+
+    fact_counter++;  // Increment fact counter 
+
+    overrideFUN = true;  // Set override flag 
+
+  } else if(stateFUN==1 && overrideFUN){  // If function button is released and overridden 
+
+    overrideFUN = false;  // Clear override flag 
+
+  }  
+
+  
+
+  // Handling various states and actions 
+
+  if(state1==1){  // If touch sensor 1 is activated 
+
+    tmrpcm.play("begi.wav");  // Play beginning audio 
+
+    delay(1000);  // Delay 
+
+  } else if(state2==1){  // If touch sensor 2 is activated 
+
+    tmrpcm.play("end.wav");  // Play ending audio 
+
+    delay(1000);  // Delay 
+
+  } else if(overrideRDN){  // If resistance down is overridden 
+
+    return;  // Exit loop 
+
+  } else if(state5==1){  // If touch sensor 5 is activated 
+
+    tmrpcm.play("info.wav");  // Play info audio 
+
+    delay(3000);  // Delay 
+
+  } else if(stateRUP==0){  // If resistance up button is pressed 
+
+    return;  // Exit loop 
+
+  } else if(state3==1){  // If touch sensor 3 is activated 
+
+    tmrpcm.play("rest.wav");  // Play rest audio 
+
+    delay(2000);  // Delay 
+
+    tmrpcm.play("down.wav");  // Play down audio 
+
+    delay(2000);  // Delay 
+
+  } else if(state4==1){  // If touch sensor 4 is activated 
+
+    tmrpcm.play("rest.wav");  // Play rest audio 
+
+    delay(2000);  // Delay 
+
+    tmrpcm.play("up.wav");  // Play up audio 
+
+    delay(1000);  // Delay 
+
+  } else if(stateFUN==0){  // If function button is pressed 
+
+    return;  // Exit loop 
+
+  }  
+
+} 
+
+ 
