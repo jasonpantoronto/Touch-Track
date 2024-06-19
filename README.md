@@ -1,3 +1,4 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Screenshot 2024-06-16 182009](https://github.com/jasonpantoronto/Touch-Track/assets/172641020/10fa2130-e9f5-4ff1-ad7c-d1250f723319)
 ![Screenshot 2024-06-16 182134](https://github.com/jasonpantoronto/Touch-Track/assets/172641020/f82bab56-9a69-473e-bb5a-629d75e96953)
 ![Screenshot 2024-06-16 182146](https://github.com/jasonpantoronto/Touch-Track/assets/172641020/0647339f-ba95-42f0-8cd7-02f88d2d487b)
